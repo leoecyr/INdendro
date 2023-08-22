@@ -1,5 +1,12 @@
 #define DEVICE_ID 0x0000
 
+// Device info
+#define DEVICE_NAME "INdendro"
+#define DEVICE_TYPE "Pro-mini"
+#define DEVICE_VOLTAGE 3.3
+#define DEVICE_FREQ 8
+#define DEVICE_VERSION "INdendro Pro-mini 3.3v 8MHz dendrometer"
+
 // Encryption setup
 //
 // Change this to increase data integrity and security
