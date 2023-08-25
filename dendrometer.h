@@ -1,15 +1,9 @@
 #include <Adafruit_NAU7802.h>
-#define DENDROMETER true
-#define DEBUG true
 
 Adafruit_NAU7802 nau;
+int32_t dendroValRaw;
 
-long dendrometer_read() {
-  int32_t dendroVal;
-  
-#if defined DEBUG
-    //Serial.println("HX711 wakeup complete");
-#endif
+void dendrometer_read() {
 
   // Read dendrometer measurement
   nau.enable(true);
@@ -17,10 +11,14 @@ long dendrometer_read() {
     delay(1);
   }
 
-  dendroVal = nau.read();
-  nau.enable(false);
+  // Fit the measured value into 16 bits
+  dendroValRaw = nau.read();
+
+  // Throw away the bottom 4 bits of the LSB and the top 12 bits of the MSW to fit in the 16 bit pakcet
+  dendroValRaw = dendroValRaw >> 4;
+  dendroVal = (int)dendroValRaw;
   
-  return dendroVal;
+  nau.enable(false);
 }
 
 void dendrometer_init() {
@@ -30,7 +28,7 @@ void dendrometer_init() {
   Serial.println("Found NAU7802");
 
   nau.setLDO(NAU7802_3V0);
-  Serial.print("LDO voltage set to ");
+/*  Serial.print("LDO voltage set to ");
   switch (nau.getLDO()) {
     case NAU7802_4V5:  Serial.println("4.5V"); break;
     case NAU7802_4V2:  Serial.println("4.2V"); break;
@@ -42,9 +40,9 @@ void dendrometer_init() {
     case NAU7802_2V4:  Serial.println("2.4V"); break;
     case NAU7802_EXTERNAL:  Serial.println("External"); break;
   }
-
+*/
   nau.setGain(NAU7802_GAIN_128);
-  Serial.print("Gain set to ");
+/*  Serial.print("Gain set to ");
   switch (nau.getGain()) {
     case NAU7802_GAIN_1:  Serial.println("1x"); break;
     case NAU7802_GAIN_2:  Serial.println("2x"); break;
@@ -55,9 +53,9 @@ void dendrometer_init() {
     case NAU7802_GAIN_64:  Serial.println("64x"); break;
     case NAU7802_GAIN_128:  Serial.println("128x"); break;
   }
-
+*/
   nau.setRate(NAU7802_RATE_10SPS);
-  Serial.print("Conversion rate set to ");
+/*  Serial.print("Conversion rate set to ");
   switch (nau.getRate()) {
     case NAU7802_RATE_10SPS:  Serial.println("10 SPS"); break;
     case NAU7802_RATE_20SPS:  Serial.println("20 SPS"); break;
@@ -65,9 +63,10 @@ void dendrometer_init() {
     case NAU7802_RATE_80SPS:  Serial.println("80 SPS"); break;
     case NAU7802_RATE_320SPS:  Serial.println("320 SPS"); break;
   }
+*/
 
   // Take 10 readings to flush out readings
-  for (uint8_t i=0; i<10; i++) {
+  for (i=0; i<10; i++) {
     while (! nau.available()) delay(1);
     nau.read();
   }

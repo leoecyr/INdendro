@@ -2,7 +2,8 @@
 #include "RH_RF95.h"
 #include "AES.h"
 
-#define RADIO true
+#define DEBUG true
+
 // Type changes for different sensor arrangements and for new or updated schemas
 #define PACKET_TYPE 0x0000
 
@@ -30,6 +31,8 @@ RH_RF95 rf95(RFM95_CS, RFM95_INT);
 
 // instance of the encryption driver
 AES128 aes128;
+
+//char txt_buf[80]; // Buffer for debugging purposes
 
 byte clear_packet[MAX_PACKET_BYTES];
 byte cipher_packet[MAX_PACKET_BYTES];
@@ -109,11 +112,19 @@ void encrypt_packet() {
   //  output: byte cipher_packet[]
   //
   int blk_cnt_max = MAX_PACKET_BYTES / 16;  // AES 128 has 16 byte keys for 16 bytes of data
-  for(int blk_offset = 0; blk_offset < blk_cnt_max; blk_offset++) {
-    aes128.encryptBlock(&cipher_packet[blk_offset * 16], &clear_packet[blk_offset * 16]); //cypher->output block and cleartext->input block
+  for(i = 0; i < blk_cnt_max; i++) {
+    aes128.encryptBlock(&cipher_packet[i * 16], &clear_packet[i * 16]); //cypher->output block and cleartext->input block
   }
 }
 
+void radio_packet_debug() {
+  for(i; i < 7; i++) {
+    Serial.print(clear_packet[i]);
+  }
+  Serial.println(clear_packet[7]);
+}
+
+/* Debugging only
 // Specific to dendrometer packet type 0x00
 char *decode_to_text_00(int rssi) {
   // Eight unsigned integers are encoded in 16 bytes
@@ -123,3 +134,4 @@ char *decode_to_text_00(int rssi) {
   //device_id, device_ver, packet_type, sequence_id, meas_0, meas_1, meas_2, meas_3);
   return txt_buf;
 }
+*/

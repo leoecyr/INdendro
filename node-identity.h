@@ -14,7 +14,7 @@
 //  If this node is to work on an existing network, use the key for that network
 //
 // 16 byte (128bit) encryption key
-byte key[16]={
+const byte key[16]={
   0x00, 0x00, 0x00, 0x00,
   0x04, 0x04, 0x04, 0x04,
   0x08, 0x08, 0x08, 0x08,
