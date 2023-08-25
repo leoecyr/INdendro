@@ -17,10 +17,6 @@ long dendroVal = 999999; // FIXME testing value
 #define BAUD 9600
 #define TX_DELAY_SEC 1 //1800 // 1/2 hour -- will be divided into multiples of 8s
 
-
-#define BAT_LVL_PIN A2
-int batLvl = 0;
-
 // Signaling LED
 #define LED_PIN 13
 

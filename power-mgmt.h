@@ -1,5 +1,9 @@
 #define POWER-MGMT true
 
+
+#define BAT_LVL_PIN A2
+int batLvl = 0;
+
 void deep_sleep(int seconds) {
 
   // A low budget long, low-power sleep
