@@ -2,8 +2,6 @@
 #include "RH_RF95.h"
 #include "AES.h"
 
-#define DEBUG true
-
 // Type changes for different sensor arrangements and for new or updated schemas
 #define PACKET_TYPE 0x0000
 
@@ -17,6 +15,10 @@
  * |                                 |<packet id->|<---------sensor data--------->|
  * device_id, device_ver, packet_type, sequence_id, meas_0, meas_1, meas_2, meas_3
  */
+ // 0-2 are fixed; 3-7 vary at runtime
+byte clear_packet[MAX_PACKET_BYTES];
+byte cipher_packet[MAX_PACKET_BYTES];
+
 
 // LoRa radio configuration
 // 5-23 dBm
@@ -32,13 +34,19 @@ RH_RF95 rf95(RFM95_CS, RFM95_INT);
 // instance of the encryption driver
 AES128 aes128;
 
-//char txt_buf[80]; // Buffer for debugging purposes
 
-byte clear_packet[MAX_PACKET_BYTES];
-byte cipher_packet[MAX_PACKET_BYTES];
-
+void radio_packet_debug() {
+  for(i; i < 7; i++) {
+    Serial.print(clear_packet[i], HEX);
+    Serial.print(":");
+  }
+  Serial.println(clear_packet[7], HEX);
+}
 
 void radio_init() {
+#if defined DEBUG
+  Serial.println("radio_init()");
+#endif
 
   pinMode(RFM95_RST, OUTPUT);
   digitalWrite(RFM95_RST, HIGH);
@@ -53,44 +61,58 @@ void radio_init() {
   digitalWrite(RFM95_CS, HIGH);
 
   while (!rf95.init()) {
-  if(DEBUG) {
+#if defined DEBUG
       Serial.println("LoRa radio init failed");
       Serial.println("Uncomment '#define SERIAL_DEBUG' in RH_RF95.cpp for detailed debug info");
-  }
-
+#endif
     delay(1000);
-    //while (1);
   }
 
-  if(DEBUG) {
+#if defined DEBUG
   Serial.println("LoRa radio init OK!");
-  }
-
+#endif
   // Defaults after init are 434.0MHz, modulation GFSK_Rb250Fd250, +13dbM
   if (!rf95.setFrequency(RF95_FREQ)) {
-    if(DEBUG) {
+#if defined DEBUG
       Serial.println("setFrequency failed");
-    }
+#endif
+
     while (1);
   }
 
-    if(DEBUG) {
+#if defined DEBUG
       Serial.print("Set Freq to: ");
       Serial.println(RF95_FREQ);
-    }
+#endif
     
   // This module has the PA_BOOST transmitter pin, permitting powers from 5 to 23 dBm:
   rf95.setTxPower(TX_POWER, false);
-    if(DEBUG) {
+#if defined DEBUG
     Serial.print("Set Tx power to: ");
     Serial.print(TX_POWER);
     Serial.println(" dBm");
-    }
+#endif
     
   //
   // Defaults after init are 434.0MHz, 13dBm, Bw = 125 kHz, Cr = 4/5, Sf = 128chips/symbol, CRC on
 
   aes128.setKey(key,16);
+
+#if defined debug
+  Serial.println("radio_init() Complete");
+#endif
+}
+
+void radio_send() {
+  rf95.send((uint8_t *)cipher_packet, MAX_PACKET_BYTES);  
+  rf95.waitPacketSent();
+
+#if defined DEBUG
+#endif
+  radio_packet_debug();
+
+  Serial.println("Packet sent");
+
 }
 
 void radio_sleep() {
@@ -108,30 +130,15 @@ void radio_wake() {
 
 void encrypt_packet() {
   //
-  //  input:  byte clear_packet[]
+  //  Manipulated in-place
+  //  input: unsigned int packet_vars[8]
+  //  interim:  byte clear_packet[]
   //  output: byte cipher_packet[]
   //
+  memcpy(clear_packet, packet_vars, 16);
+    
   int blk_cnt_max = MAX_PACKET_BYTES / 16;  // AES 128 has 16 byte keys for 16 bytes of data
   for(i = 0; i < blk_cnt_max; i++) {
     aes128.encryptBlock(&cipher_packet[i * 16], &clear_packet[i * 16]); //cypher->output block and cleartext->input block
   }
 }
-
-void radio_packet_debug() {
-  for(i; i < 7; i++) {
-    Serial.print(clear_packet[i]);
-  }
-  Serial.println(clear_packet[7]);
-}
-
-/* Debugging only
-// Specific to dendrometer packet type 0x00
-char *decode_to_text_00(int rssi) {
-  // Eight unsigned integers are encoded in 16 bytes
-  unsigned int temp_vals[8];
-  memcpy(temp_vals, clear_packet, 16);
-  sprintf(txt_buf, "%X,%X,%X,%X, %d,%d,%d,%d, %d\n", temp_vals[0], temp_vals[1], temp_vals[2], temp_vals[3], temp_vals[4], temp_vals[5], temp_vals[6], temp_vals[7], rssi);
-  //device_id, device_ver, packet_type, sequence_id, meas_0, meas_1, meas_2, meas_3);
-  return txt_buf;
-}
-*/

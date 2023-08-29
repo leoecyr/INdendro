@@ -5,8 +5,10 @@
 #define THERMISTOR_POWER_PIN 5
 
 void thermistor_init() {
-  //
-  // Set device power pins and LED as OUTPUT:
+#if defined DEBUG
+  Serial.println("thermistor_init()");
+#endif
+
   pinMode(THERMISTOR_POWER_PIN, OUTPUT);
 }
 
