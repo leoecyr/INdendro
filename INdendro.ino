@@ -109,10 +109,9 @@ void loop() {
 #endif // - DEBUG
 
     encrypt_packet(); // encrypted output in cipher_packet
-    //radio_wake();
+    radio_wake();
     radio_send();
-    delay(1000);
-    //radio_sleep();
+    radio_sleep();
 
 #if defined DEBUG
     digitalWrite(LED_PIN, LOW);
