@@ -62,13 +62,14 @@ void setup()
 
 int seq_num = 0;  // packet sequence counter
 void loop() {
-  // Read battery level at BL0:  +VCC--/\3.3M/\--BL0--/\1.0M/\--GND
+  // Read battery level at BAT_LVL_PIN:  +VCC--/\3.3M/\--BAT_LVL_PIN--/\1.0M/\--GND
   //analogReference(INTERNAL1V1);
   analogReference(INTERNAL);
   batLvl = analogRead(BAT_LVL_PIN);
   analogReference(DEFAULT);
   
 #if defined THERMISTOR
+    // Read thermistor voltage at A4: +(Vcc)THERMISTOR_POWER_PIN--/\--15k--/\--THERMISTOR_PIN--/\--Thermistor--/\--GND
     thermistor_read(); // Result left in global to decrease runtime memory requirements
 #endif
 
