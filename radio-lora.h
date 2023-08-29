@@ -34,7 +34,7 @@ RH_RF95 rf95(RFM95_CS, RFM95_INT);
 // instance of the encryption driver
 AES128 aes128;
 
-
+#if defined DEBUG
 void radio_packet_debug() {
   for(i; i < 7; i++) {
     Serial.print(clear_packet[i], HEX);
@@ -42,6 +42,7 @@ void radio_packet_debug() {
   }
   Serial.println(clear_packet[7], HEX);
 }
+#endif
 
 void radio_init() {
 #if defined DEBUG
@@ -108,10 +109,9 @@ void radio_send() {
   rf95.waitPacketSent();
 
 #if defined DEBUG
-#endif
-  radio_packet_debug();
-
   Serial.println("Packet sent");
+  radio_packet_debug();
+#endif
 
 }
 

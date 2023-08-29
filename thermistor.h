@@ -15,7 +15,7 @@ void thermistor_init() {
 void thermistor_read() {
   // Enable power to thermistor and stabilize
   digitalWrite(THERMISTOR_POWER_PIN, HIGH);
-  //delay(1000); // stabilize temperature -- no, just elevate; right?  Or, is there wide variation in ADC conversion time?  Compare.
+  //delay(1000); // stabilize temperature -- no, just elevate temp
   thermValue = analogRead(THERMISTOR_PIN);
   digitalWrite(THERMISTOR_POWER_PIN, LOW);
 }

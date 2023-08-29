@@ -72,16 +72,18 @@ void dendrometer_init() {
   }
 
   while (! nau.calibrate(NAU7802_CALMOD_INTERNAL)) {
+#if defined DEBUG
     Serial.println("Failed to calibrate internal offset, retrying!");
+#endif
     delay(1000);
   }
-  Serial.println("Calibrated internal offset");
 
   while (! nau.calibrate(NAU7802_CALMOD_OFFSET)) {
+#if defined DEBUG
     Serial.println("Failed to calibrate system offset, retrying!");
+#endif
     delay(1000);
   }
-  Serial.println("Calibrated system offset");
 
   return;
 }

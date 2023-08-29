@@ -1,6 +1,5 @@
 #include "LowPower.h"
 
-
 // GLOBALS -- Variables requiring visibility across modules
 int thermValue = 9999;  // variable to store the value coming from the sensor
 int batLvl = 0;
@@ -109,9 +108,9 @@ void loop() {
 #endif // - DEBUG
 
     encrypt_packet(); // encrypted output in cipher_packet
-    radio_wake();
+    //radio_wake();
     radio_send();
-    radio_sleep();
+    //radio_sleep();
 
 #if defined DEBUG
     digitalWrite(LED_PIN, LOW);
