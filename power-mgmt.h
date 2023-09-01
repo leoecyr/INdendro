@@ -1,5 +1,6 @@
-
-
+//
+// Manage deep sleep using LowPower library and stock Arduino hardware
+//
 #define BAT_LVL_PIN A2
 
 void deep_sleep(int seconds) {

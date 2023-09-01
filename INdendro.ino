@@ -14,19 +14,22 @@ int i;  // local iterator used multiply in multiple modules NOT recursively OR E
 // END GLOBALS
 
 
-// Module code inclusion/exclusion
+// Module code inclusion/exclusion enable/disable
 #include "node-identity.h";
 #include "power-mgmt.h";
+
 #include "dendrometer.h";
-#include "thermistor.h";
-#include "radio-lora.h";
-
-
-// Module enable/disable
-//#define DEBUG true
 #define DENDROMETER true
+
+#include "thermistor.h";
 #define THERMISTOR true
+
+#include "radio-lora.h";
 #define RADIO true
+
+// DEBUGGING compile-time switches
+//#define DEBUG_RADIO true
+//#define DEBUG true
 
 #define BAUD 9600
 #define TX_DELAY_SEC 1800 // 1/2 hour -- will be divided into multiples of 8s
@@ -38,6 +41,11 @@ int i;  // local iterator used multiply in multiple modules NOT recursively OR E
 
 void setup() 
 {
+#if defined DEBUG_RADIO
+  Serial.begin(BAUD);
+  Serial.println(DEVICE_VERSION);
+#endif
+
 #if defined DEBUG
   Serial.begin(BAUD);
   Serial.println(DEVICE_VERSION);

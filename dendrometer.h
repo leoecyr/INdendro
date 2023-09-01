@@ -23,10 +23,12 @@ void dendrometer_read() {
 
 void dendrometer_init() {
   if (! nau.begin()) {
+#if defined DEBUG
     Serial.println("Failed to find NAU7802");
+#endif
+    delay(1);
   }
-  Serial.println("Found NAU7802");
-
+  
   nau.setLDO(NAU7802_3V0);
 /*  Serial.print("LDO voltage set to ");
   switch (nau.getLDO()) {

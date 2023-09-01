@@ -34,7 +34,8 @@ RH_RF95 rf95(RFM95_CS, RFM95_INT);
 // instance of the encryption driver
 AES128 aes128;
 
-#if defined DEBUG
+#if defined DEBUG_RADIO
+
 void radio_packet_debug() {
   for(i; i < 7; i++) {
     Serial.print(clear_packet[i], HEX);
@@ -45,7 +46,7 @@ void radio_packet_debug() {
 #endif
 
 void radio_init() {
-#if defined DEBUG
+#if defined DEBUG_RADIO
   Serial.println("radio_init()");
 #endif
 
@@ -62,33 +63,33 @@ void radio_init() {
   digitalWrite(RFM95_CS, HIGH);
 
   while (!rf95.init()) {
-#if defined DEBUG
+#if defined DEBUG_RADIO
       Serial.println("LoRa radio init failed");
-      Serial.println("Uncomment '#define SERIAL_DEBUG' in RH_RF95.cpp for detailed debug info");
+      Serial.println("Uncomment '#define SERIAL_DEBUG_RADIO' in RH_RF95.cpp for detailed debug info");
 #endif
     delay(1000);
   }
 
-#if defined DEBUG
+#if defined DEBUG_RADIO
   Serial.println("LoRa radio init OK!");
 #endif
   // Defaults after init are 434.0MHz, modulation GFSK_Rb250Fd250, +13dbM
   if (!rf95.setFrequency(RF95_FREQ)) {
-#if defined DEBUG
+#if defined DEBUG_RADIO
       Serial.println("setFrequency failed");
 #endif
 
     while (1);
   }
 
-#if defined DEBUG
+#if defined DEBUG_RADIO
       Serial.print("Set Freq to: ");
       Serial.println(RF95_FREQ);
 #endif
     
   // This module has the PA_BOOST transmitter pin, permitting powers from 5 to 23 dBm:
   rf95.setTxPower(TX_POWER, false);
-#if defined DEBUG
+#if defined DEBUG_RADIO
     Serial.print("Set Tx power to: ");
     Serial.print(TX_POWER);
     Serial.println(" dBm");
@@ -108,7 +109,7 @@ void radio_send() {
   rf95.send((uint8_t *)cipher_packet, MAX_PACKET_BYTES);  
   rf95.waitPacketSent();
 
-#if defined DEBUG
+#if defined DEBUG_RADIO
   Serial.println("Packet sent");
   radio_packet_debug();
 #endif
